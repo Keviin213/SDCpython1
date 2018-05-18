@@ -1,4 +1,4 @@
 Flask
 requests
-json
+jsonlib-python3
 
