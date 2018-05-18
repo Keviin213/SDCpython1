@@ -1,3 +1,4 @@
+--find-links wheelhouse
 Flask
 requests
 jsonlib-python3
