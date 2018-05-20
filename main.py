@@ -18,13 +18,27 @@ def vision():
 
   region = 'westcentralus' #Here you enter the region of your subscription
   url = 'https://{}.api.cognitive.microsoft.com/vision/v1.0/analyze'.format(region)
-  key = "3b290a5c45cf4f76aa61e5fb77347a07"
+  key = "bsbsbs"
   maxNumRetries = 1
 
-#  vreq = req.url 
-#  vresp = req.json()
-  vreq = "test.url"
-  vresp = "{test response}"
+  pathToFileInDisk = r'static/img/cut.jpg'
+  with open( pathToFileInDisk, 'rb' ) as f:
+    data = f.read()
+
+# Computer Vision parameters
+  params = { 'visualFeatures' : 'categories,tags,description,faces'}
+
+  headers = dict()
+  headers['Ocp-Apim-Subscription-Key'] = key
+  headers['Content-Type'] = 'application/octet-stream'
+
+  json = None
+  response = requests.request( 'post', url, json = json, data = data, headers = headers, params = params )
+
+  vreq = response.url 
+  vresp = response.json()
+#  vreq = "test.url"
+#  vresp = "{test response}"
   return render_template("vision.html", url=vreq, result=vresp)
 
 if __name__ == '__main__':
