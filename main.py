@@ -54,6 +54,12 @@ def vision():
   vresp = response.text
 
   return render_template("vision.html", url=vreq, result=vresp, pic=pic)
+  
+@app.route("/upload")
+def upload():
+ 
+  return render_template("about.html", url=treq, result=resp)
+
 
 if __name__ == '__main__':
   app.run()
