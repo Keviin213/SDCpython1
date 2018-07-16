@@ -1,7 +1,14 @@
 import requests
 from flask import Flask, render_template
 from pprint import pprint 
+import os, uuid, sys
+from azure.storage.blob import BlockBlobService, PublicAccess
+
 app = Flask(__name__)
+
+local_path=os.path.expanduser("~/Documents")
+local_file_name ="fatheadHopJuju.png"
+container_name ='quickstartblobs'
 
 @app.route('/')
 def index():
@@ -57,8 +64,20 @@ def vision():
   
 @app.route("/upload")
 def upload():
- 
-  return render_template("about.html", url=treq, result=resp)
+
+  block_blob_service = BlockBlobService(account_name='accountname', account_key='accountkey')
+  
+  local_path=os.path.expanduser("~/Documents")
+  local_file_name ="fatheadHopJuju.png"
+  container_name ='quickstartblobs'
+  full_path_to_file =os.path.join(local_path, local_file_name)
+  print("Temp file = " + full_path_to_file)
+  print("\nUploading to Blob storage as blob" + local_file_name)
+
+  block_blob_service.create_blob_from_path(container_name, local_file_name, full_path_to_file)
+    
+# return render_template("upload.html", url=treq, result=resp)
+  return render_template("upload.html")
 
 
 if __name__ == '__main__':
