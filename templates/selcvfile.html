@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+
+{% block content %}
+  <main class="hero-section">
+    <div class="container">
+      
+      <div class="section-content">
+        <h3>Select file to submit to Azure</h3>
+        <form action = "http://localhost:5000/upload" method = "POST" enctype = "multipart/form-data">
+           <input type = "file" name = "file" />
+           <input type = "submit"/>
+        </form>
+      </div>
+
+      <div class="section-device">
+        <img src="static/img/plane.png">
+      </div>
+      
+      <div class="clearfix"></div>
+
+    </div>
+  </main>
+{% endblock %}
