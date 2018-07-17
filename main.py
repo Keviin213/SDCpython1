@@ -1,14 +1,31 @@
 import requests
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from pprint import pprint 
 import os, uuid, sys
 from azure.storage.blob import BlockBlobService, PublicAccess
 
 app = Flask(__name__)
 
+#
+#  set some variables
+#
 local_path=os.path.expanduser("~/Documents")
 local_file_name ="fatheadHopJuju.png"
 container_name ='quickstartblobs'
+local_file_name ="fatheadHopJuju.png"
+local_path=os.path.expanduser("~/Documents/UPLOAD")
+#  set the subscription key from Azure Cognitive Services Resource Group
+#
+#
+#  set the region to use and the url/resource_path for the API nethond
+#
+region = 'westcentralus' #Here you enter the region of your subscription
+url = 'https://{}.api.cognitive.microsoft.com/vision/v1.0/analyze'.format(region)
+key = "4287cca65e4446d0a360841265095710"
+pic = "static/img/person.jpg"
+
+storage_account = 'inststorageaccount'
+account_key = 'EdUwI34WmY0zlbmYXlvoG6+wqAsJ68j/b6sSpb8EIOIAl/2Bh3g4VTgJzI5PZTzksg0iScymQeAURiefv94MsA=='
 
 @app.route('/')
 def index():
@@ -24,24 +41,8 @@ def about():
 @app.route("/vision")
 def vision():
 
-#
-#  set the region to use and the url/resource_path for the API nethond
-#
-#  set the subscription key from Azure Cognitive Services Resource Group
-#
-  region = 'westcentralus' #Here you enter the region of your subscription
-  url = 'https://{}.api.cognitive.microsoft.com/vision/v1.0/analyze'.format(region)
-  key = "bsbsbsbsbss"
-#
-#  picture that will be sent for processing
-#  located in the img directory
-#   under  static/img 
-  pic = "static/img/people.jpg"
   maxNumRetries = 1
 
-#
-# read the file from local disc
-#
   pathToFileInDisk = pic
   with open( pathToFileInDisk, 'rb' ) as f:
     data = f.read()
@@ -62,23 +63,32 @@ def vision():
 
   return render_template("vision.html", url=vreq, result=vresp, pic=pic)
   
-@app.route("/upload")
-def upload():
-
-  block_blob_service = BlockBlobService(account_name='accountname', account_key='accountkey')
+@app.route('/selcvfile')
+def selcvfile():
+  return render_template("selcvfile.html") 
   
-  local_path=os.path.expanduser("~/Documents")
-  local_file_name ="fatheadHopJuju.png"
-  container_name ='quickstartblobs'
-  full_path_to_file =os.path.join(local_path, local_file_name)
-  print("Temp file = " + full_path_to_file)
-  print("\nUploading to Blob storage as blob" + local_file_name)
-
+@app.route("/upload", methods = {'GET', 'POST'})
+def upload():
+  
+  if request.method == 'POST':
+     
+     req_file = request.files['file']
+     print("in POST if, filename is " + req_file.filename)
+     local_file_name = req_file.filename
+     full_path_to_file = os.path.join(local_path, local_file_name)
+     req_file.save(os.path.join(local_path, local_file_name))
+     
+  block_blob_service = BlockBlobService(account_name=storage_account, account_key=account_key)
   block_blob_service.create_blob_from_path(container_name, local_file_name, full_path_to_file)
-    
-# return render_template("upload.html", url=treq, result=resp)
-  return render_template("upload.html")
 
+  return render_template("upload.html")
+  
+@app.route('/listcont')
+def listcont():
+
+  block_blob_service = BlockBlobService(account_name=storage_account, account_key=account_key)
+  list = block_blob_service.list_blobs(container_name)
+  return render_template("listcont.html",container=container_name,list=list)  
 
 if __name__ == '__main__':
   app.run()
