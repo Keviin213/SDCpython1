@@ -2,7 +2,7 @@
 
 This is a minimal sample app that is used in the SDC class
 
-This repository can directly be deployed to Azure App Service.
+This repository should be deployed on a client
 
 
 # Contributing
