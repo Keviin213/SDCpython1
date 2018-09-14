@@ -21,11 +21,11 @@ local_path=os.path.expanduser("~/Documents/UPLOAD")
 #
 region = 'westcentralus' #Here you enter the region of your subscription
 url = 'https://{}.api.cognitive.microsoft.com/vision/v1.0/analyze'.format(region)
-key = "nononeedhelpfwithdf"
+key = "4287cca65e4446d0a360841265095710"
 pic = "static/img/person.jpg"
 
 storage_account = 'inststorageaccount'
-account_key = 'nonaneedshelppickinganimals'
+account_key =  'EdUwI34WmY0zlbmYXlvoG6+wqAsJ68j/b6sSpb8EIOIAl/2Bh3g4VTgJzI5PZTzksg0iScymQeAURiefv94MsA=='
 
 @app.route('/')
 def index():
@@ -55,7 +55,7 @@ def vision():
   headers['Ocp-Apim-Subscription-Key'] = key
   headers['Content-Type'] = 'application/octet-stream'
 
-  json = None
+  json = true 
   response = requests.request( 'post', url, json = json, data = data, headers = headers, params = params )
 
   vreq = response.url 
@@ -88,7 +88,7 @@ def listcont():
 
   block_blob_service = BlockBlobService(account_name=storage_account, account_key=account_key)
   list = block_blob_service.list_blobs(container_name)
-  return render_template("listcont.html",container=container_name,list=list)  
+  return render_template("listcont.html",container=container_name,list=list,account=storage_account)   
 
 if __name__ == '__main__':
   app.run()
