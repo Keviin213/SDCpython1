@@ -2,7 +2,13 @@ import requests
 from flask import Flask, render_template, request
 from pprint import pprint 
 import os, uuid, sys
+
+connection_string = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
 from azure.storage.blob import BlobServiceClient
+blob_service_client = BlobServiceClient.from_connection_string(connection_string)
+
+# Instantiate a new ContainerClient
+
 
 app = Flask(__name__)
 
@@ -27,7 +33,7 @@ pic = "static/img/person.jpg"
 #storage_account = 'inststorageaccount'
 #account_key =  'EdUwI34WmY0zlbmYXlvoG6+wqAsJ68j/b6sSpb8EIOIAl/2Bh3g4VTgJzI5PZTzksg0iScymQeAURiefv94MsA=='
 
-connection_string = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
+
 
 @app.route('/')
 def index():
@@ -75,13 +81,17 @@ def upload():
   if request.method == 'POST':
      
      req_file = request.files['file']
-     print("in POST if, filename is " + req_file.filename)
+     print("in POST , filename is " + req_file.filename)
      local_file_name = req_file.filename
      full_path_to_file = os.path.join(local_path, local_file_name)
      req_file.save(os.path.join(local_path, local_file_name))
      
-  block_blob_service = BlockBlobService(account_name=storage_account, account_key=account_key)
-  block_blob_service.create_blob_from_path(container_name, local_file_name, full_path_to_file)
+     container_client = blob_service_client.get_container_client("myblockcontainersync")
+     blob_client = container_client.get_blob_client("myblockblob")
+     with open("static/img/full-sail-home.jpg", "rb") as data:
+                blob_client.upload_blob(data, blob_type="BlockBlob")
+ # block_blob_service = BlockBlobService(account_name=storage_account, account_key=account_key)
+ # block_blob_service.create_blob_from_path(container_name, local_file_name, full_path_to_file)
 
   return render_template("upload.html")
   
