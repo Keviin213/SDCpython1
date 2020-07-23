@@ -2,10 +2,8 @@ import requests
 from flask import Flask, render_template, request
 from pprint import pprint 
 import os, uuid, sys
+from azure.storage.blob import BlobClient
 
-connection_string = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
-from azure.storage.blob import BlobServiceClient
-blob_service_client = BlobServiceClient.from_connection_string(connection_string)
 
 # Instantiate a new ContainerClient
 
@@ -15,13 +13,9 @@ app = Flask(__name__)
 #
 #  set some variables
 #
-local_path=os.path.expanduser("~/Documents")
-local_file_name ="fatheadHopJuju.png"
-container_name ='quickstartblobs'
-local_file_name ="fatheadHopJuju.png"
-local_path=os.path.expanduser("~/Documents/UPLOAD")
-#  set the subscription key from Azure Cognitive Services Resource Group
-#
+local_path="upload"
+connection_string = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
+
 #
 #  set the region to use and the url/resource_path for the API nethond
 #
@@ -83,16 +77,16 @@ def upload():
      req_file = request.files['file']
      print("in POST , filename is " + req_file.filename)
      local_file_name = req_file.filename
-     full_path_to_file = os.path.join(local_path, local_file_name)
      req_file.save(os.path.join(local_path, local_file_name))
-     
-     container_client = blob_service_client.get_container_client("myblockcontainersync")
-     blob_client = container_client.get_blob_client("myblockblob")
-     with open("static/img/full-sail-home.jpg", "rb") as data:
+     upfile = os.path.join(local_path, local_file_name)
+     print("Path " + os.path.join(local_path, local_file_name))
+     print("upfile " + upfile)
+     blob_client = BlobClient.from_connection_string(conn_str=connection_string, container_name="upload", blob_name=local_file_name)
+     with open(upfile, "rb") as data:
                 blob_client.upload_blob(data, blob_type="BlockBlob")
- # block_blob_service = BlockBlobService(account_name=storage_account, account_key=account_key)
- # block_blob_service.create_blob_from_path(container_name, local_file_name, full_path_to_file)
 
+     os.remove(os.path.join(local_path, local_file_name))
+ 
   return render_template("upload.html")
   
 @app.route('/listcont')
