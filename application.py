@@ -12,10 +12,14 @@ app = Flask(__name__)
 
 #
 #  set some variables
+#. local path is the directory int the app directory
+#. connection_string is from the storage account
+#. container_name is the upload destinarion container 
+#. in the storage account
 #
 local_path="upload"
 connection_string = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
-
+container_name = "upload"
 #
 #  set the region to use and the url/resource_path for the API nethond
 #
@@ -81,13 +85,13 @@ def upload():
      upfile = os.path.join(local_path, local_file_name)
      print("Path " + os.path.join(local_path, local_file_name))
      print("upfile " + upfile)
-     blob_client = BlobClient.from_connection_string(conn_str=connection_string, container_name="upload", blob_name=local_file_name)
+     blob_client = BlobClient.from_connection_string(conn_str=connection_string, container_name=container_name, blob_name=local_file_name)
      with open(upfile, "rb") as data:
                 blob_client.upload_blob(data, blob_type="BlockBlob")
 
      os.remove(os.path.join(local_path, local_file_name))
  
-  return render_template("upload.html")
+  return render_template("upload.html", file=local_file_name, container=container_name)
   
 @app.route('/listcont')
 def listcont():
