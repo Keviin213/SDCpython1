@@ -80,7 +80,7 @@ def upload():
      client = ComputerVisionClient( endpoint=computervision_endpoint,credentials=credentials)
      print("endpoint " + computervision_endpoint)
 
-     results = client.describe_image("https://homepages.cae.wisc.edu/~ece533/images/zelda.png")
+ #    results = client.describe_image("https://homepages.cae.wisc.edu/~ece533/images/zelda.png")
 
 #     with open("upload/cut.jpg", "rb") as image_stream:
 #         image_analysis = client.analyze_image_in_stream(

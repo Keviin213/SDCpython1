@@ -3,4 +3,4 @@ Flask
 requests
 jsonlib-python3
 azure-storage-blob
-
+azure-cognitiveservices-vision-computervision
