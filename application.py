@@ -74,30 +74,35 @@ def upload():
      with open(upfile, "rb") as data:
                 blob_client.upload_blob(data, blob_type="BlockBlob")
 
-# Now we send it of for analysis
-     credentials = CognitiveServicesCredentials(computervision_key)
-     computervision_endpoint = "https://eastus.api.cognitive.microsoft.com"
-     client = ComputerVisionClient( endpoint=computervision_endpoint,credentials=credentials)
-     print("endpoint " + computervision_endpoint)
+# Now we send it off for analysis
+ 
 
- #    results = client.describe_image("https://homepages.cae.wisc.edu/~ece533/images/zelda.png")
 
-#     with open("upload/cut.jpg", "rb") as image_stream:
-#         image_analysis = client.analyze_image_in_stream(
-#            image=image_stream,
-#            visual_features=[
-#                VisualFeatureTypes.image_type,  # Could use simple str "ImageType"
-#                VisualFeatureTypes.faces,      # Could use simple str "Faces"
-#                VisualFeatureTypes.categories,  # Could use simple str "Categories"
-#                VisualFeatureTypes.color,      # Could use simple str "Color"
-#                VisualFeatureTypes.tags,       # Could use simple str "Tags"
-#                VisualFeatureTypes.description  # Could use simple str "Description"
-#            ]
-#         )
-    
+     client = ComputerVisionClient(
+        endpoint="https://eastus.api.cognitive.microsoft.com/",
+        credentials=CognitiveServicesCredentials(computervision_key)
+     )
+
+     with open(upfile, "rb") as image_stream:
+           image_analysis = client.analyze_image_in_stream(
+           image=image_stream,
+           visual_features=[
+                VisualFeatureTypes.image_type,  # Could use simple str "ImageType"
+                VisualFeatureTypes.faces,      # Could use simple str "Faces"
+                VisualFeatureTypes.categories,  # Could use simple str "Categories"
+                VisualFeatureTypes.objects,      # Could use simple str "Color"
+                VisualFeatureTypes.tags,       # Could use simple str "Tags"
+                VisualFeatureTypes.description  # Could use simple str "Description"
+            ]     
+        )
+     print("analysis: : {}\n".format(image_analysis.objects[0].object_property))
+     desc = image_analysis.description.captions[0].text
+     obj = image_analysis.objects[0].object_property
+     img = "https://storageaccountpytho80e3.blob.core.windows.net/upload/" + local_file_name
      os.remove(os.path.join(local_path, local_file_name))
  
-  return render_template("upload.html",file=local_file_name, container=container)
+  return render_template("upload.html",file=local_file_name,
+   container=container,descr=desc,pic=img,object=obj)
   
 @app.route('/listcont')
 def listcont():
