@@ -95,6 +95,7 @@ def upload():
      
      if (len(image_analysis.objects) == 0):
          print("No objects detected.")
+         objs="No Objects detected"
      else: 
          objs = ""
          for tag in image_analysis.objects:
