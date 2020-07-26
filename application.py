@@ -2,6 +2,8 @@ import requests
 from flask import Flask, render_template, request
 from pprint import pprint 
 import os, uuid, sys
+import datetime
+import json
 from azure.storage.blob import BlobClient
 from azure.cognitiveservices.vision.computervision import ComputerVisionClient
 from azure.cognitiveservices.vision.computervision.models import OperationStatusCodes
@@ -21,7 +23,10 @@ local_path="upload"
 container = "upload"
 connection_string = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
 computervision_key = os.getenv("COMPUTERVISION_SUBSCRIPTION_KEY")
-COMPUTERVISION_LOCATION = os.environ.get("COMPUTERVISION_LOCATION", "eastus")
+computervision_location = os.environ.get("COMPUTERVISION_LOCATION", "eastus")
+container_name = "upload"
+#storage_account = os.getenv("STORAGE_ACCOUNT")
+storage_account = "storageaccountpytho80e3"
 
 #  set the region to use and the url/resource_path for the API nethond
 #
@@ -43,16 +48,10 @@ def vision():
 
   print("in vision , filename is " + current_file)
  
-
-#  with open()
-# Computer Vision parameters
-  params = { 'visualFeatures' : 'categories,brands,description,objects,faces'}
-
-# Computer Vision header fields
-
  
 
   return render_template("vision.html", url=endpoint, result=curent_file, pic=local_file_name)
+
   
 @app.route('/selcvfile')
 def selcvfile():
@@ -64,22 +63,20 @@ def upload():
   if request.method == 'POST':
      
      req_file = request.files['file']
-     print("in POST , filename is " + req_file.filename)
-     local_file_name = req_file.filename
+     tstamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+     local_file_name = tstamp + "-" + req_file.filename
      req_file.save(os.path.join(local_path, local_file_name))
-     upfile = os.path.join(local_path, local_file_name)
-     print("Path " + os.path.join(local_path, local_file_name))
-     print("upfile " + upfile)
-     blob_client = BlobClient.from_connection_string(conn_str=connection_string, container_name="upload", blob_name=local_file_name)
+     upfile = os.path.join(local_path, local_file_name) 
+
+     blob_client = BlobClient.from_connection_string(conn_str=connection_string,
+      container_name=container_name, blob_name=local_file_name)
      with open(upfile, "rb") as data:
                 blob_client.upload_blob(data, blob_type="BlockBlob")
 
 # Now we send it off for analysis
  
-
-
      client = ComputerVisionClient(
-        endpoint="https://eastus.api.cognitive.microsoft.com/",
+        endpoint="https://" + computervision_location + ".api.cognitive.microsoft.com/",
         credentials=CognitiveServicesCredentials(computervision_key)
      )
 
@@ -95,14 +92,24 @@ def upload():
                 VisualFeatureTypes.description  # Could use simple str "Description"
             ]     
         )
-     print("analysis: : {}\n".format(image_analysis.objects[0].object_property))
+     
+     if (len(image_analysis.objects) == 0):
+         print("No objects detected.")
+     else: 
+         objs = ""
+         for tag in image_analysis.objects:
+             print("'{}' with confidence {:.2f}%".format(tag.object_property, tag.confidence * 100))
+             objs = objs + " " + tag.object_property
+             print("objs " + objs)
+     
      desc = image_analysis.description.captions[0].text
-     obj = image_analysis.objects[0].object_property
-     img = "https://storageaccountpytho80e3.blob.core.windows.net/upload/" + local_file_name
+     img = "https://" + storage_account + ".blob.core.windows.net/" + container_name + "/" + local_file_name
+     
+
      os.remove(os.path.join(local_path, local_file_name))
  
   return render_template("upload.html",file=local_file_name,
-   container=container,descr=desc,pic=img,object=obj)
+   container=container,descr=desc,pic=img,object=objs)
   
 @app.route('/listcont')
 def listcont():
