@@ -9,7 +9,13 @@
     <p>uploaded File: {{ file}}</p>
     <p>Target Container: {{ container }}</p>
     <p>Image Description: {{ descr }}</p>
-    <p>Objects Found: {{ object }}</p>
+    {% for item in object %}
+       <li>Object Found: {{ item }}</li>
+       {% endfor %}
+    {% for item in faces %}
+       <li>Face Found: {{ item }}</li>
+       {% endfor %}
+ 
     <img src= {{ pic }}>
     <a href="{{ url_for('index') }}" class="btn-secondary"> Return to Main Page</a>
     </div>

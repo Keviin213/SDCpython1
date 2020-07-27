@@ -97,20 +97,37 @@ def upload():
          print("No objects detected.")
          objs="No Objects detected"
      else: 
-         objs = ""
+         objs = [] 
          for tag in image_analysis.objects:
              print("'{}' with confidence {:.2f}%".format(tag.object_property, tag.confidence * 100))
-             objs = objs + " " + tag.object_property
-             print("objs " + objs)
+             objs.append("'{}' with confidence {:.2f}%".format(tag.object_property, tag.confidence * 100)) 
      
-     desc = image_analysis.description.captions[0].text
+     if (len(image_analysis.description.captions) == 0):
+         print("No captions detected.")
+     else:
+        for caption in image_analysis.description.captions:
+            desc = []
+            tstr = "'{}' with confidence {:.2f}%".format(caption.text, caption.confidence * 100)
+            desc.append(tstr)
+            print(tstr) 
+
+     if (len(image_analysis.faces) == 0):
+         print("No faces detected.")
+         facs="No Objects detected"
+     else: 
+         facs = [] 
+         for face in image_analysis.faces:
+             #print("'{}' with confidence {:.2f}%".format(tag.object_property, tag.confidence * 100))
+             facs.append("Gender:  {}  Age: {:d}".format(face.gender, face.age)) 
+             print( facs )
+
+     #desc = image_analysis.description.captions[0].text
      img = "https://" + storage_account + ".blob.core.windows.net/" + container_name + "/" + local_file_name
      
-
-     os.remove(os.path.join(local_path, local_file_name))
+     os.remove(upfile)
  
   return render_template("upload.html",file=local_file_name,
-   container=container,descr=desc,pic=img,object=objs)
+   container=container,descr=desc,pic=img,object=objs,faces=facs)
   
 @app.route('/listcont')
 def listcont():
