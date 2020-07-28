@@ -26,7 +26,7 @@ computervision_key = os.getenv("COMPUTERVISION_SUBSCRIPTION_KEY")
 computervision_location = os.environ.get("COMPUTERVISION_LOCATION", "eastus")
 container_name = "upload"
 #storage_account = os.getenv("STORAGE_ACCOUNT")
-storage_account = "storageaccountpytho80e3"
+storage_account = os.getenv("STORAGE_ACCOUNT")
 
 #  set the region to use and the url/resource_path for the API nethond
 #
